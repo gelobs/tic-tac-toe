@@ -1,0 +1,15 @@
+.container{
+    display: grid;
+    grid-template-columns: auto auto auto;
+    background-color: aqua;
+    width: 600px;
+    height: 400px;
+    margin: auto;
+    margin-top: 100px;
+}
+
+.container-item{
+    color: white;
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    text-align: center;
+}
