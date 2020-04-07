@@ -1,41 +1,73 @@
+// Game turn global variable
+var turn = true;
+
+
 // Gameboard module
-const gameBoard = ((mark, index)=>{
+const gameBoard = (()=>{
     const gameboard=['', '', '', '','','','','',''];
-    gameboard[index]=mark;
-    return gameboard;
+    addMark = function(mark, id) {
+        gameboard[id] = mark;
+    }
+    gameOver = function(){
+        
+    }
+    return {gameboard, addMark};
 })();
 
-// Display Controller module
-const displayController =(()=>{
-    let id;
-    let containerItems = document.querySelectorAll('.container-item');
-    for(let i=0; i < containerItems.length; i++){
-        containerItems[i].addEventListener('click', (e) => {
-            console.log(e.target.id);
-            id = e.target.id;
-        }) 
-    }
-    return id;
-})();
 
 // Player 
 const Player = (name, mark) => {
-    let id = displayController;
-    console.log(id);
-    return {name, mark, id};
+    playerMove = function(){
+        var id;
+        let containerItems = document.querySelectorAll('.container-item');
+        for(let i=0; i < containerItems.length; i++){
+            containerItems[i].addEventListener('click', (e) => {
+                id = e.target.id;
+                // Prevent marking an existing mark on board
+                if(gameBoard.gameboard[id]==''){
+                    gameBoard.addMark(mark, id);
+                    console.log(e.target.id);
+                }
+                render();
+            }); 
+        }
+    }
+    return {name, mark, playerMove};
 }
 
 // render function
-function render(player){
+function render(){
     var containerItems = document.querySelectorAll('.container-item');
-    var gameboard = gameBoard(player.mark, player.id);
+    var gameboard = gameBoard.gameboard;
     for(var i=0; i < containerItems.length; i++){
         containerItems[i].textContent = gameboard[i];
     }
 }
-const player1 = Player('Miranda', 'O');
-const player2 = Player('Sotos', 'X');
+
+const controlFlow = (()=>{
+    const player1 = Player('Miranda', 'O');
+    const player2 = Player('Sotos', 'X');
+    changeTurn = function(){
+        turn = !turn;
+    }
+    selectPlayer = function(){
+        if (turn == true) {
+            alert(`${player1.name} make your move`);
+            player1.playerMove();
+            controlFlow.changeTurn;
+        }else{
+            alert(`${player2.name} make your move`);
+            player2.playerMove();
+            controlFlow.changeTurn;
+        }
+        // turn = !turn;
+    }
+    return {selectPlayer, changeTurn};
+})();
 
 
-render(player1);
+// Display Controller module
+const displayController =(()=>{
+    controlFlow.selectPlayer();
+})();
 
