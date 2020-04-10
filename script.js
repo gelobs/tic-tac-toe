@@ -4,70 +4,129 @@ var turn = true;
 
 // Gameboard module
 const gameBoard = (()=>{
-    const gameboard=['', '', '', '','','','','',''];
-    addMark = function(mark, id) {
-        gameboard[id] = mark;
+    let _gameBoardArray=['','','','','','','','',''];
+    addMark = function(mark, position) {
+        if(_gameBoardArray[position]==''){
+            _gameBoardArray[position] = mark;
+        }   
     }
-    gameOver = function(){
-        
+    clearBoard = function(){
+        _gameBoardArray = ['','','','','','','','',''];
     }
-    return {gameboard, addMark};
+    getBoard = () => {return _gameBoardArray};
+    return {getBoard, addMark, clearBoard};
 })();
 
 
-// Player 
+// Player object
 const Player = (name, mark) => {
-    playerMove = function(){
-        var id;
-        let containerItems = document.querySelectorAll('.container-item');
-        for(let i=0; i < containerItems.length; i++){
-            containerItems[i].addEventListener('click', (e) => {
-                id = e.target.id;
-                // Prevent marking an existing mark on board
-                if(gameBoard.gameboard[id]==''){
-                    gameBoard.addMark(mark, id);
-                    console.log(e.target.id);
-                }
-                render();
-            }); 
-        }
-    }
-    return {name, mark, playerMove};
-}
-
-// render function
-function render(){
-    var containerItems = document.querySelectorAll('.container-item');
-    var gameboard = gameBoard.gameboard;
-    for(var i=0; i < containerItems.length; i++){
-        containerItems[i].textContent = gameboard[i];
-    }
+    const getName = () => name;
+    const getMark = () => mark;
+    let positions = [];
+    return {getName, getMark, positions};
 }
 
 const controlFlow = (()=>{
-    const player1 = Player('Miranda', 'O');
-    const player2 = Player('Sotos', 'X');
-    changeTurn = function(){
-        turn = !turn;
+    let player1; 
+    let player2;
+    let currentPlayer;
+    let containerItems = document.querySelectorAll('.container-item');
+    const newGame = function(){
+        player1 = Player('Player 1', 'X');
+        player2 = Player('Player 2', 'O');
+        currentPlayer = player1;
+        console.log(`${currentPlayer.getName()} is your turn`);
     }
-    selectPlayer = function(){
-        if (turn == true) {
-            alert(`${player1.name} make your move`);
-            player1.playerMove();
-            controlFlow.changeTurn;
+    const _changeTurn = function(){
+        turn=!turn;
+    }
+    // newGame();
+    const placeMark = function(){
+        containerItems.forEach(item => {
+            item.addEventListener('click',(event)=>{
+                console.log(event);
+                let position = event.target.id;
+                let mark = currentPlayer.getMark();
+                let tempGameboard =gameBoard.getBoard();
+                // Avoid marking the same square twice
+                if(tempGameboard[position]==''){
+                    gameBoard.addMark(mark, position);
+                    // Saving players moves on board
+                    if(currentPlayer==player1){
+                        player1.positions.push(position);
+                        console.log(player1.positions);
+                    }else{
+                        player2.positions.push(position);
+                    }
+                    displayController.renderContent();
+                    _changeTurn();
+                    nextTurn();
+                }
+            })
+        })
+    }
+    const nextTurn = function(){
+        if(turn==true){
+            currentPlayer = player1;
         }else{
-            alert(`${player2.name} make your move`);
-            player2.playerMove();
-            controlFlow.changeTurn;
+            currentPlayer = player2;
         }
-        // turn = !turn;
+        console.log(`${currentPlayer.getName()} is your turn`);
+        winRound();
     }
-    return {selectPlayer, changeTurn};
-})();
 
+    const winRound = function(){
+        const NUMBER_OF_SQUARES = 3
+        const winCombinations = ['012', '345', '678', '036', '147', '258', '048', '246'];
+        let player1Combinations = combine(player1.positions, NUMBER_OF_SQUARES);
+        let player2Combinations = combine(player2.positions, NUMBER_OF_SQUARES);
+        console.log(player1Combinations);
+    }
+    // 
+    // From stackoverflow
+    // Gives all possible combinations, given an array a, with
+    // a minimum length min
+    let combine = function(a, min) {
+        var fn = function(n, src, got, all) {
+            if (n == 0) {
+                if (got.length > 0) {
+                    all[all.length] = got;
+                }
+                return;
+            }
+            for (var j = 0; j < src.length; j++) {
+                fn(n - 1, src.slice(j + 1), got.concat([src[j]]), all);
+            }
+            return;
+        }
+        var all = [];
+        for (var i = min; i < a.length; i++) {
+            fn(i, a, [], all);
+        }
+        all.push(a);
+        return all;
+    }
+    // 
+    return {newGame, placeMark, winRound};
+})();
 
 // Display Controller module
 const displayController =(()=>{
-    controlFlow.selectPlayer();
+    const playButton = document.getElementById('play');
+    let containerItems = document.querySelectorAll('.container-item');
+    let _gameBoardArray = gameBoard.getBoard();
+    const renderContent = function(){
+        for(let i=0; i<containerItems.length; i++){
+            containerItems[i].textContent = _gameBoardArray[i];
+        }
+    }
+    const startGame = function(){
+        controlFlow.newGame();
+        controlFlow.placeMark();
+        renderContent();
+    }
+    // Click play button
+    playButton.addEventListener('click', startGame);
+    return {renderContent, containerItems}
 })();
 
