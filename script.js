@@ -23,7 +23,8 @@ const Player = (name, mark) => {
     const getName = () => name;
     const getMark = () => mark;
     let positions = [];
-    return {getName, getMark, positions};
+    let score = 0;
+    return {getName, getMark, positions, score};
 }
 
 const controlFlow = (()=>{
@@ -77,10 +78,37 @@ const controlFlow = (()=>{
 
     const winRound = function(){
         const NUMBER_OF_SQUARES = 3
+        // Create a variable to check if the game is a tie
+        let tieFlag = false;
         const winCombinations = ['012', '345', '678', '036', '147', '258', '048', '246'];
         let player1Combinations = combine(player1.positions, NUMBER_OF_SQUARES);
         let player2Combinations = combine(player2.positions, NUMBER_OF_SQUARES);
-        console.log(player1Combinations);
+        // Check if player1's combinations or player2's
+        // match the win combinations and display the winner
+        player1Combinations.forEach(combination => {
+            if(winCombinations.find(element => element == combination.join(''))!==undefined){
+                // console.log(combination.join(''));
+                alert('Player 1 won the round!');
+                player1.score++;
+                gameBoard.clearBoard();
+                tieFlag = true;
+            }
+        });
+        player2Combinations.forEach(combination => {
+            if(winCombinations.find(element => element == combination.join(''))!==undefined){
+                // console.log(combination.join(''));
+                alert('Player 2 won the round!');
+                player2.score++;
+                gameBoard.clearBoard()
+                tieFlag = true
+            }
+        });
+        // Check if match is a tie
+        if(player1.positions.length + player2.positions.length == 9 && tieFlag == false){
+            alert("It's a tie");
+        }else if(player1.positions.length + player2.positions.length == 9 && tieFlag == true){
+            tieFlag = true;
+        }
     }
     // 
     // From stackoverflow
