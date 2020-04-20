@@ -1,7 +1,6 @@
 // Game turn global variable
 var turn = true;
 
-
 // Gameboard module
 const gameBoard = (()=>{
     let _gameBoardArray=['','','','','','','','',''];
@@ -36,12 +35,12 @@ const controlFlow = (()=>{
         player1 = Player('Player 1', 'X');
         player2 = Player('Player 2', 'O');
         currentPlayer = player1;
-        console.log(`${currentPlayer.getName()} is your turn`);
+        displayController.messageInfo[0].innerHTML = `${currentPlayer.getName()} is your turn`;
     }
     const _changeTurn = function(){
         turn=!turn;
     }
-    // newGame();
+  
     const placeMark = function(){
         containerItems.forEach(item => {
             item.addEventListener('click',(event)=>{
@@ -52,7 +51,7 @@ const controlFlow = (()=>{
                 // Avoid marking the same square twice
                 if(tempGameboard[position]==''){
                     gameBoard.addMark(mark, position);
-                    // Saving players moves on board
+                    // Saving players' moves on board
                     if(currentPlayer==player1){
                         player1.positions.push(position);
                         console.log(player1.positions);
@@ -72,7 +71,7 @@ const controlFlow = (()=>{
         }else{
             currentPlayer = player2;
         }
-        console.log(`${currentPlayer.getName()} is your turn`);
+        displayController.messageInfo[0].innerHTML = `${currentPlayer.getName()} is your turn`;
         winRound();
     }
 
@@ -88,32 +87,31 @@ const controlFlow = (()=>{
         player1Combinations.forEach(combination => {
             if(winCombinations.find(element => element == combination.join(''))!==undefined){
                 // console.log(combination.join(''));
-                alert('Player 1 won the round!');
+                displayController.messageInfo[0].innerHTML = 'Player 1 won the round!';
                 player1.score++;
-                gameBoard.clearBoard();
                 tieFlag = true;
             }
         });
         player2Combinations.forEach(combination => {
             if(winCombinations.find(element => element == combination.join(''))!==undefined){
                 // console.log(combination.join(''));
-                alert('Player 2 won the round!');
+                displayController.messageInfo[0].innerHTML = 'Player 2 won the round!';
                 player2.score++;
-                gameBoard.clearBoard()
                 tieFlag = true
             }
         });
         // Check if match is a tie
         if(player1.positions.length + player2.positions.length == 9 && tieFlag == false){
-            alert("It's a tie");
+            displayController.messageInfo[0].innerHTML = "It's a tie!";
         }else if(player1.positions.length + player2.positions.length == 9 && tieFlag == true){
             tieFlag = true;
         }
+        displayController.updateScore(player1, player2);
     }
     // 
     // From stackoverflow
-    // Gives all possible combinations, given an array a, with
-    // a minimum length min
+    // Gives all possible combinations, given an array 'a', with
+    // a minimum length 'min'
     let combine = function(a, min) {
         var fn = function(n, src, got, all) {
             if (n == 0) {
@@ -135,26 +133,73 @@ const controlFlow = (()=>{
         return all;
     }
     // 
-    return {newGame, placeMark, winRound};
+    const resetGame = function(){
+        player1.score=0;
+        player1.positions=[];
+        player2.score=0;
+        player2.positions=[];
+        gameBoard.clearBoard();
+        displayController.updateScore(player1, player2);
+        displayController.clearDisplay();
+        displayController.messageInfo[0].innerHTML = "Resetting the game. Click 'Play' button to play again."
+    }
+    const restartGame = function(){
+        player1.positions=[];
+        player2.positions=[];
+        gameBoard.clearBoard();
+        displayController.clearDisplay();
+        currentPlayer = player1;
+        turn = true;
+        displayController.messageInfo[0].innerHTML = `New round. ${currentPlayer.getName()} is your turn.`
+    }
+    return {newGame, placeMark, winRound, restartGame, resetGame};
 })();
 
 // Display Controller module
 const displayController =(()=>{
     const playButton = document.getElementById('play');
+    const resetGameButton = document.getElementById('reset');
     let containerItems = document.querySelectorAll('.container-item');
-    let _gameBoardArray = gameBoard.getBoard();
+    let player1Score = document.getElementById('score1');
+    let player2Score = document.getElementById('score2');
+    let messageInfo = document.getElementsByClassName('display-message');
+    
     const renderContent = function(){
+        let _gameBoardArray = gameBoard.getBoard();
         for(let i=0; i<containerItems.length; i++){
             containerItems[i].textContent = _gameBoardArray[i];
         }
     }
-    const startGame = function(){
-        controlFlow.newGame();
+    const startGame = function(event){
+        if(playButton.innerHTML == "Play"){
+            controlFlow.newGame();
+        }else{
+            controlFlow.restartGame();
+            console.log(event);
+        }
+        playButton.innerHTML = "Restart Game";
         controlFlow.placeMark();
         renderContent();
     }
+    const clearDisplay = function(){
+        containerItems.forEach(containerItem =>{
+            containerItem.textContent = '';
+        })
+    }
+    const resetGame = function(event){
+        console.log(event);
+        controlFlow.resetGame();
+        playButton.innerHTML = "Play";
+    }
+    const updateScore = function(player1, player2){
+        player1Score.textContent = player1.score;
+        player2Score.textContent = player2.score;
+    }
+
     // Click play button
     playButton.addEventListener('click', startGame);
-    return {renderContent, containerItems}
+    // Click reset button
+    resetGameButton.addEventListener('click', resetGame);
+    return {renderContent, clearDisplay, updateScore, messageInfo}
 })();
 
