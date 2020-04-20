@@ -3,8 +3,8 @@
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
     background-color: aqua;
-    width: 400px;
-    height: 400px;
+    width: 350px;
+    height: 350px;
     margin: auto;
     margin-top: 100px;
 }
@@ -17,4 +17,16 @@
     border: 1px solid rgba(0, 0, 0, 0.8);
     text-align: center;
     font-size: 45px;
+}
+
+.display-message{
+    position: relative;
+    width: 350px;
+    height: 100%;
+    padding-top: 50px;
+    margin-top: 500px;
+    background-color: rgb(73, 51, 51);
+    color: rgba(243, 187, 2, 0.8);
+    margin: auto;
+    text-align: center;
 }
