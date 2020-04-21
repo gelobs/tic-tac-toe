@@ -4,7 +4,13 @@
         <title>Tic-Tac-Toe</title>
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
-    <body style="background-color: rosybrown;">
+    <body style="background-color: rgb(73, 51, 51);">
+        <h2>Tic Tac Toe</h2>
+        <div class="score-board">
+            Score<br>
+            <div class="players">Player 1: <span id='score1'>0</span> |</div> 
+            <div class="players">Player 2: <span id='score2'>0</span></div>
+        </div>
         <div class="container">
             <div class="container-item" id='0'></div>
             <div class="container-item" id='1'></div>
@@ -17,14 +23,12 @@
             <div class="container-item" id='8'></div>
         </div>
         <div class='display-message'>
-            Hello friend!
+            Hello! Click 'Play' button to start the game! 
         </div>
-        <div class="score-board">
-            <div class="player-1">Player1: <span id='score1'>0</span></div>
-            <div class="player-2">Player2: <span id='score2'>0</span></div>
+        <div class="buttons">
+            <button id='play'>Play</button>
+            <button id='reset'>Reset Game</button>
         </div>
-        <button id='play'>Play</button>
-        <button id='reset'>Reset Game</button>
         <script src='script.js'></script>
     </body>
 </html>
