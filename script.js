@@ -32,12 +32,14 @@ const controlFlow = (()=>{
     let player2;
     let currentPlayer;
     let containerItems = document.querySelectorAll('.container-item');
+
     const newGame = function(){
         player1 = Player('Player 1', 'X');
         player2 = Player('Player 2', 'O');
         currentPlayer = player1;
-        displayController.messageInfo[0].innerHTML = `${currentPlayer.getName()} is your turn`;
+        displayController.messageInfo[0].innerHTML = `${currentPlayer.getName()} is your turn.`;
     }
+
     const changeTurn = function(){
         turn=!turn;
     }
@@ -75,7 +77,7 @@ const controlFlow = (()=>{
         }else{
             currentPlayer = player2;
         }
-        displayController.messageInfo[0].innerHTML = `${currentPlayer.getName()} is your turn`;
+        displayController.messageInfo[0].innerHTML = `${currentPlayer.getName()} is your turn.`;
         winRound();
     }
 
@@ -187,6 +189,7 @@ const displayController =(()=>{
             containerItems[i].textContent = gameBoardArray[i];
         }
     }
+
     const startGame = function(event){
         if(playButton.innerHTML == "Play"){
             controlFlow.newGame();
@@ -198,16 +201,19 @@ const displayController =(()=>{
         controlFlow.placeMark();
         renderContent();
     }
+
     const clearDisplay = function(){
         containerItems.forEach(containerItem =>{
             containerItem.textContent = '';
         })
     }
+
     const resetGame = function(event){
         console.log(event);
         controlFlow.resetGame();
         playButton.innerHTML = "Play";
     }
+    
     const updateScore = function(player1, player2){
         player1Score.textContent = player1.score;
         player2Score.textContent = player2.score;
