@@ -92,7 +92,6 @@ const controlFlow = (()=>{
         // match the win combinations and display the winner
         player1Combinations.forEach(combination => {
             if(winCombinations.find(element => element == combination.join(''))!==undefined){
-                // console.log(combination.join(''));
                 displayController.messageInfo[0].innerHTML = 'Player 1 won the round!';
                 player1.score++;
                 tieFlag = true;
@@ -101,7 +100,6 @@ const controlFlow = (()=>{
         });
         player2Combinations.forEach(combination => {
             if(winCombinations.find(element => element == combination.join(''))!==undefined){
-                // console.log(combination.join(''));
                 displayController.messageInfo[0].innerHTML = 'Player 2 won the round!';
                 player2.score++;
                 tieFlag = true
@@ -213,7 +211,7 @@ const displayController =(()=>{
         controlFlow.resetGame();
         playButton.innerHTML = "Play";
     }
-    
+
     const updateScore = function(player1, player2){
         player1Score.textContent = player1.score;
         player2Score.textContent = player2.score;
