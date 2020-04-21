@@ -3,16 +3,16 @@ var turn = true;
 
 // Gameboard module
 const gameBoard = (()=>{
-    let _gameBoardArray=['','','','','','','','',''];
+    let gameBoardArray=['','','','','','','','',''];
     addMark = function(mark, position) {
-        if(_gameBoardArray[position]==''){
-            _gameBoardArray[position] = mark;
+        if(gameBoardArray[position]==''){
+            gameBoardArray[position] = mark;
         }   
     }
     clearBoard = function(){
-        _gameBoardArray = ['','','','','','','','',''];
+        gameBoardArray = ['','','','','','','','',''];
     }
-    getBoard = () => {return _gameBoardArray};
+    getBoard = () => {return gameBoardArray};
     return {getBoard, addMark, clearBoard};
 })();
 
@@ -26,6 +26,7 @@ const Player = (name, mark) => {
     return {getName, getMark, positions, score};
 }
 
+// Creating the game logic
 const controlFlow = (()=>{
     let player1; 
     let player2;
@@ -37,34 +38,37 @@ const controlFlow = (()=>{
         currentPlayer = player1;
         displayController.messageInfo[0].innerHTML = `${currentPlayer.getName()} is your turn`;
     }
-    const _changeTurn = function(){
+    const changeTurn = function(){
         turn=!turn;
     }
   
     const placeMark = function(){
         containerItems.forEach(item => {
-            item.addEventListener('click',(event)=>{
-                console.log(event);
-                let position = event.target.id;
-                let mark = currentPlayer.getMark();
-                let tempGameboard =gameBoard.getBoard();
-                // Avoid marking the same square twice
-                if(tempGameboard[position]==''){
-                    gameBoard.addMark(mark, position);
-                    // Saving players' moves on board
-                    if(currentPlayer==player1){
-                        player1.positions.push(position);
-                        console.log(player1.positions);
-                    }else{
-                        player2.positions.push(position);
-                    }
-                    displayController.renderContent();
-                    _changeTurn();
-                    nextTurn();
-                }
-            })
-        })
+            item.addEventListener('click',handleMarking)
+        });
     }
+
+    function handleMarking(event){
+            console.log(event);
+            let position = event.target.id;
+            let mark = currentPlayer.getMark();
+            let tempGameboard =gameBoard.getBoard();
+            // Avoid marking the same square twice
+            if(tempGameboard[position]==''){
+                gameBoard.addMark(mark, position);
+                // Saving players' moves on board
+                if(currentPlayer==player1){
+                    player1.positions.push(position);
+                    console.log(player1.positions);
+                }else{
+                    player2.positions.push(position);
+                }
+                displayController.renderContent();
+                changeTurn();
+                nextTurn();
+            }
+    }
+
     const nextTurn = function(){
         if(turn==true){
             currentPlayer = player1;
@@ -80,8 +84,8 @@ const controlFlow = (()=>{
         // Create a variable to check if the game is a tie
         let tieFlag = false;
         const winCombinations = ['012', '345', '678', '036', '147', '258', '048', '246'];
-        let player1Combinations = combine(player1.positions, NUMBER_OF_SQUARES);
-        let player2Combinations = combine(player2.positions, NUMBER_OF_SQUARES);
+        let player1Combinations = combine(player1.positions.sort(), NUMBER_OF_SQUARES);
+        let player2Combinations = combine(player2.positions.sort(), NUMBER_OF_SQUARES);
         // Check if player1's combinations or player2's
         // match the win combinations and display the winner
         player1Combinations.forEach(combination => {
@@ -90,6 +94,7 @@ const controlFlow = (()=>{
                 displayController.messageInfo[0].innerHTML = 'Player 1 won the round!';
                 player1.score++;
                 tieFlag = true;
+                stopGame();
             }
         });
         player2Combinations.forEach(combination => {
@@ -98,16 +103,19 @@ const controlFlow = (()=>{
                 displayController.messageInfo[0].innerHTML = 'Player 2 won the round!';
                 player2.score++;
                 tieFlag = true
+                stopGame();
             }
         });
         // Check if match is a tie
         if(player1.positions.length + player2.positions.length == 9 && tieFlag == false){
             displayController.messageInfo[0].innerHTML = "It's a tie!";
+            stopGame();
         }else if(player1.positions.length + player2.positions.length == 9 && tieFlag == true){
             tieFlag = true;
         }
         displayController.updateScore(player1, player2);
     }
+
     // 
     // From stackoverflow
     // Gives all possible combinations, given an array 'a', with
@@ -133,6 +141,7 @@ const controlFlow = (()=>{
         return all;
     }
     // 
+
     const resetGame = function(){
         player1.score=0;
         player1.positions=[];
@@ -143,6 +152,7 @@ const controlFlow = (()=>{
         displayController.clearDisplay();
         displayController.messageInfo[0].innerHTML = "Resetting the game. Click 'Play' button to play again."
     }
+
     const restartGame = function(){
         player1.positions=[];
         player2.positions=[];
@@ -152,10 +162,17 @@ const controlFlow = (()=>{
         turn = true;
         displayController.messageInfo[0].innerHTML = `New round. ${currentPlayer.getName()} is your turn.`
     }
+
+    const stopGame = function(){
+        containerItems.forEach(item =>{
+            item.removeEventListener('click', handleMarking, false);
+        })
+    }
     return {newGame, placeMark, winRound, restartGame, resetGame};
 })();
 
 // Display Controller module
+// UI-DOM manipulation
 const displayController =(()=>{
     const playButton = document.getElementById('play');
     const resetGameButton = document.getElementById('reset');
@@ -165,9 +182,9 @@ const displayController =(()=>{
     let messageInfo = document.getElementsByClassName('display-message');
     
     const renderContent = function(){
-        let _gameBoardArray = gameBoard.getBoard();
+        let gameBoardArray = gameBoard.getBoard();
         for(let i=0; i<containerItems.length; i++){
-            containerItems[i].textContent = _gameBoardArray[i];
+            containerItems[i].textContent = gameBoardArray[i];
         }
     }
     const startGame = function(event){
