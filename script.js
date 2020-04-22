@@ -51,7 +51,6 @@ const controlFlow = (()=>{
     }
 
     function handleMarking(event){
-            console.log(event);
             let position = event.target.id;
             let mark = currentPlayer.getMark();
             let tempGameboard =gameBoard.getBoard();
@@ -150,6 +149,7 @@ const controlFlow = (()=>{
         gameBoard.clearBoard();
         displayController.updateScore(player1, player2);
         displayController.clearDisplay();
+        stopGame();
         displayController.messageInfo[0].innerHTML = "Resetting the game. Click 'Play' button to play again."
     }
 
